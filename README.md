@@ -7,6 +7,7 @@
 - Make sure that Interpreter is using the python from the relvant conda env
 - Make sure to have pylint and python intercative set up
 - Set up Google Cloud Build
+  - Create new project for this
   - Add a push trigger 
   - Add docker file into git
   - Test docker
