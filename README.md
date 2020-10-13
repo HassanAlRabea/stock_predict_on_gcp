@@ -16,6 +16,7 @@
   - Requires a server so that it can listen and answer queries
   - Add a flask server
   - Setup continuous build
+  - 
 
 I was hoping to use it 
 ### Backlog for the next sprint
