@@ -1,13 +1,13 @@
 from flask import Flask
-from src.business_logic.process_query import process_data
+
 app = Flask(__name__)
 
+from process_query import process_data
 
 @app.route('/')
 def hello_world():
-    prediction = process_data('nflx')
-    print('Hello World! Testing auto run deployment - Trial number 3')
-    return print(prediction)
+    prediction = process_data('nflx').to_string(header = True, index = False)
+    return prediction
 
 if __name__ == '__main__':
     # Used when running locally only. When deploying to Cloud Run,
