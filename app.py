@@ -4,11 +4,16 @@ app = Flask(__name__)
 
 from src.business_logic.process_query import process_data
 
-@app.route('/')
-def hello_world():
+@app.route('/', methods=['GET'])
+def hello():
+    return f'Hello! Please edit the URL with your desired ticker:!\nEX: /get_stock_val/<ticker>\n'
 
-    prediction = process_data('aapl').to_string(header = True, index = False)
+@app.route('/get_stock_val/<ticker>', methods=['GET'])
+def get_stock_value(ticker):
+    prediction = process_data(ticker).to_string(header = True, index = False)
+    
     return prediction
+
 
 if __name__ == '__main__':
     # Used when running locally only. When deploying to Cloud Run,
