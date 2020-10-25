@@ -6,6 +6,7 @@ from process_query import process_data
 
 @app.route('/')
 def hello_world():
+    
     prediction = process_data('aapl').to_string(header = True, index = False)
     return prediction
 
