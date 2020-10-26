@@ -9,3 +9,12 @@ def get_last_stock_price(ticker, last=False):
         start_date = now - timedelta(days=500)
         return si.get_data(ticker, start_date, interval = "1d")
     return si.get_data(ticker)
+
+def get_sp500_tickers():
+    # Obtain the SP 500 Tickers 
+    sp_500 = si.tickers_sp500()
+    #Removing problematic tickers
+    sp_500.remove("BF.B")
+    sp_500.remove("BRK.B")
+
+    return sp_500
