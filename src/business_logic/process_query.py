@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 
+from datetime import date, datetime, time, timedelta
 from src.IO.fetch_stock_data import get_last_stock_price
 from src.algo.stock_model import get_preds_mov_avg
 
@@ -10,11 +11,20 @@ cv_size = 0.1                   # proportion of dataset to be used as cross-vali
 N_opt_ma = 2
 
 def process_data(ticker):
-    ## MA Final Model
+    ## Moving Average Final Model
     results_ma = pd.DataFrame()
 
     # for ticker in sp_500:
     df = get_last_stock_price(ticker, True)
+
+    #Extending df to get tomorrow's date
+    nextdf = pd.DataFrame(np.zeros(len(df.columns)).reshape(1,len(df.columns)), columns = df.columns)
+    as_list = nextdf.index.tolist()
+    idx = as_list.index(0)
+    as_list[idx] =  pd.to_datetime(pd.datetime.today()+ timedelta(days=1)).strftime('%Y-%m-%d')
+    nextdf.index = as_list
+    df = df.append(nextdf)
+
     # Convert Date column to datetime
     df.loc[:, 'date'] = pd.to_datetime(df.index,format='%Y-%m-%d')
     # Change all column headings to be lower case, and remove spacing
@@ -28,9 +38,6 @@ def process_data(ticker):
     num_test = 1
     num_train = len(df) - num_cv - num_test
 
-    # Split into train, cv, and test
-    train = df[:num_train].copy()
-    cv = df[num_train:num_train+num_cv].copy()
     #Train and CV DF - for simpler models that do not have hyperparameters it becomes and 80/20 split
     train_cv = df[:num_train+num_cv].copy()
     test = df[num_train+num_cv:].copy()

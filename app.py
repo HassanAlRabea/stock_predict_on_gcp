@@ -1,4 +1,5 @@
 from flask import Flask
+import pandas as pd
 
 app = Flask(__name__)
 
@@ -10,10 +11,12 @@ def hello():
 
 @app.route('/get_stock_val/<ticker>', methods=['GET'])
 def get_stock_value(ticker):
-    prediction = process_data(ticker).to_string(header = True, index = False)
-    
-    return prediction
-
+    prediction = process_data(ticker)
+    # .to_string(header = True, index = False)
+    pred_price = prediction['predicted_price'].to_string(header = True, index = False)
+    recommendation = prediction['recommendation'].to_string(header = True, index = False)
+    answer = "Tomorrow's predicted price for " + str(ticker) + " is " + str(pred_price) + ". We recommend you to " + recommendation + " it."
+    return answer
 
 if __name__ == '__main__':
     # Used when running locally only. When deploying to Cloud Run,
