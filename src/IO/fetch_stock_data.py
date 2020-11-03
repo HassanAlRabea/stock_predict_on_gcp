@@ -16,5 +16,6 @@ def get_sp500_tickers():
     #Removing problematic tickers
     sp_500.remove("BF.B")
     sp_500.remove("BRK.B")
+    sp_500.remove("VNT")
 
     return sp_500

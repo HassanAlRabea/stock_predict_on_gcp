@@ -19,12 +19,12 @@ def get_stock_value(ticker):
     # pred_price = prediction['predicted_price'].to_string(header = True, index = False)
     recommendation = prediction[1]
     # ba_score = str(round(balanced_accuracy_result() * 100,2)) + " %"
-    # ba_score_clf = str(round(balanced_accuracy_result_clf() * 100,2)) + " %"
+    ba_score_clf = str(round(balanced_accuracy_result_clf() * 100,2)) + " %"
     ba_score_test = prediction[0]
     answer = "Tomorrow's prediction for " + str(ticker) + ": "  \
         + ". We recommend you to " + recommendation + " it." \
-        +" Note that our latest balanced accuracy score for this ticker is: " + ba_score_test
-        # +" . Note that our latest SP 500 balanced accuracy score is: " + ba_score_clf
+        +" Note that our latest balanced accuracy score for this ticker is: " + ba_score_test \
+        +" . Note that our latest SP 500 balanced accuracy score is: " + ba_score_clf
     return answer
 
 def test():
