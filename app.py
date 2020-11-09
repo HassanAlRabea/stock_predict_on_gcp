@@ -25,7 +25,7 @@ def get_stock_value(ticker):
     return answer
 
 @app.route('/evaluate', methods=['GET'])
-def evaluate(ticker):
+def evaluate():
     ba_score_clf = str(round(balanced_accuracy_result_clf() * 100,2)) + " %"
     answer = "Our latest SP 500 balanced accuracy score is: " + ba_score_clf
     return answer
