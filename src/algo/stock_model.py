@@ -1,27 +1,103 @@
 
 import numpy as np
 import pandas as pd
+import logging
 
-def get_preds_mov_avg(df, target_col, N, pred_min, offset):
-    """
-    Given a dataframe, get prediction at timestep t using values from t-1, t-2, ..., t-N.
-    Using simple moving average.
-    Inputs
-        df         : dataframe with the values you want to predict. Can be of any length.
-        target_col : name of the column you want to predict e.g. 'adj_close'
-        N          : get prediction at timestep t using values from t-1, t-2, ..., t-N
-        pred_min   : all predictions should be >= pred_min
-        offset     : for df we only do predictions for df[offset:]. e.g. offset can be size of training set
-    Outputs
-        pred_list  : list. The predictions for target_col. np.array of length len(df)-offset.
-    """
-    pred_list = df[target_col].rolling(window = N, min_periods=1).mean() # len(pred_list) = len(df)
-    
-    # Add one timestep to the predictions
-    pred_list = np.concatenate((np.array([np.nan]), np.array(pred_list[:-1])))
-    
-    # If the values are < pred_min, set it to be pred_min
-    pred_list = np.array(pred_list)
-    pred_list[pred_list < pred_min] = pred_min
-    
-    return pred_list[offset:]
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import balanced_accuracy_score
+
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.metrics import balanced_accuracy_score
+from datetime import date, datetime, time, timedelta
+from src.IO.fetch_stock_data import get_last_stock_price
+from src.IO.fetch_stock_data import get_sp500_tickers
+from src.algo.stock_model import get_preds_mov_avg
+
+
+def get_transformed_data(ticker):
+    # for ticker in sp_500:
+    df = get_last_stock_price(ticker, True)
+
+    ## Append tomorrow's date to the frame
+    nextdf = pd.DataFrame(np.zeros(len(df.columns)).reshape(1,len(df.columns)), columns = df.columns)
+    as_list = nextdf.index.tolist()
+    idx = as_list.index(0)
+    as_list[idx] =  pd.to_datetime(pd.datetime.today()+ timedelta(days=1)).strftime('%Y-%m-%d')
+    nextdf.index = as_list
+    df = df.append(nextdf)
+
+    ## Transformations: add previous close and signal
+    df['previous_close'] = df['close'].shift()
+    df['signal'] = np.where(df['close'] > df['previous_close'], 0, 1)
+    df = df.dropna()      
+
+    # Convert Date column to datetime
+    df.loc[:, 'date'] = pd.to_datetime(df.index,format='%Y-%m-%d')
+    # Change all column headings to be lower case, and remove spacing
+    df.columns = [str(x).lower().replace(' ', '_') for x in df.columns]
+    # # # Get month of each sample
+    df['month'] = df['date'].dt.month
+    # # Sort by datetime
+    df.sort_values(by='date', inplace=True, ascending=True)
+
+    return df
+
+def get_train_test_split(df):
+    #### Input params ##################
+    test_size = 0.1                 # proportion of dataset to be used as test set
+    cv_size = 0.3                   # proportion of dataset to be used as cross-validation set
+    num_cv = int(cv_size*len(df))
+    num_test = int(test_size*len(df))
+    num_train = len(df) - num_cv - num_test
+
+    # Split into train, cv, and test
+    #Train and CV DF - for simpler models that do not have hyperparameters it becomes and 80/20 split
+    train_cv = df[:num_train+num_cv].copy()
+    test = df[num_train+num_cv:].copy()
+
+    y_traincv = train_cv['signal']
+    X_traincv = train_cv[['previous_close', 'month']]
+    y_test = test['signal']
+    X_test = test[['previous_close', 'month']]
+
+    return y_traincv, X_traincv, y_test, X_test
+
+def get_best_parameters(df):
+    y_traincv, X_traincv, y_test, X_test = get_train_test_split(df)
+    rfr = RandomForestClassifier(n_estimators=100, max_depth=30, bootstrap=True)
+    # Training and doing CV to find the best parameters
+    param_dist = dict(n_estimators=list(range(1,30)), max_depth=list(range(1,10)))
+    rand = RandomizedSearchCV(rfr, param_dist, cv=10, n_iter=20, random_state=0, verbose = 1)
+    rand.fit(X_traincv, y_traincv)
+    rand.cv_results_
+    n_estimators = rand.best_params_['n_estimators']
+    max_depth = rand.best_params_['max_depth']
+
+    return n_estimators, max_depth
+
+#BaseEstimator: Base class for all estimators in scikit-learn
+class Stock_model(BaseEstimator, TransformerMixin):
+
+    def __init__(self, data_fetcher):
+        self.log = logging.getLogger()
+        self.rfr = RandomForestClassifier() # it's an object of linear regression class(object)
+        self._data_fetcher = data_fetcher
+        self.log.warning('here')
+        self.y_traincv, self.X_traincv, self.y_test, self.X_test = get_train_test_split(self._data_fetcher)
+                   
+    def fit(self):
+        n_estimators, max_depth = get_best_parameters(self._data_fetcher)
+        self.rfr = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, bootstrap=True)
+        self.rfr.fit(self.X_traincv, self.y_traincv)
+        return self
+
+    def predict(self):
+        y_pred = self.rfr.predict(self.X_test)
+        ba = str(round(balanced_accuracy_score(np.array(self.y_test), y_pred)*100,2)) + " %"
+        y_pred_text = np.where(y_pred == 0, "Buy", "Sell")
+        tomorrow_recommend = y_pred_text[-1]
+        results = np.array([ba,tomorrow_recommend])
+        return results
