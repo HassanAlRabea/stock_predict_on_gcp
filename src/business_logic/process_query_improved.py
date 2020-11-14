@@ -9,10 +9,10 @@ from src.algo.stock_model import get_transformed_data
 from src.algo.stock_model import Stock_model
 
 
-def create_business_logic():
+def create_business_logic(ticker):
     # This line here will return a dataframe for the ticker and save
     # in data_fetcher
-    data_fetcher = get_transformed_data
+    data_fetcher = get_transformed_data(ticker)
     #Returns the creation of the businesslogic object containing the model in question
     #which was trained on a specific ticker
     return BusinessLogic(Stock_model(data_fetcher))

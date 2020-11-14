@@ -14,7 +14,6 @@ from sklearn.metrics import balanced_accuracy_score
 from datetime import date, datetime, time, timedelta
 from src.IO.fetch_stock_data import get_last_stock_price
 from src.IO.fetch_stock_data import get_sp500_tickers
-from src.algo.stock_model import get_preds_mov_avg
 
 
 def get_transformed_data(ticker):
