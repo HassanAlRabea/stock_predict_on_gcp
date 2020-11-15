@@ -1,13 +1,10 @@
 import configparser
 import logging
-
 import joblib
 
 from src.IO.fetch_stock_data import get_last_stock_price
 from src.IO.storage_tools import create_bucket, get_model_from_bucket, upload_file_to_bucket
-from src.algo.stock_model import get_transformed_data
-from src.algo.stock_model import Stock_model
-
+from src.algo.stock_model import get_transformed_data, Stock_model
 
 def create_business_logic(ticker):
     # This line here will return a dataframe for the ticker and save
@@ -16,7 +13,6 @@ def create_business_logic(ticker):
     #Returns the creation of the businesslogic object containing the model in question
     #which was trained on a specific ticker
     return BusinessLogic(Stock_model(data_fetcher))
-
 
 class BusinessLogic:
     #Creates the business logic object

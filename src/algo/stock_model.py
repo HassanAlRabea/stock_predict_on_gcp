@@ -1,20 +1,13 @@
-
 import numpy as np
 import pandas as pd
 import logging
 
 from sklearn.model_selection import RandomizedSearchCV
-from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix
 from sklearn.metrics import balanced_accuracy_score
-
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.metrics import balanced_accuracy_score
 from datetime import date, datetime, time, timedelta
 from src.IO.fetch_stock_data import get_last_stock_price
-from src.IO.fetch_stock_data import get_sp500_tickers
-
 
 def get_transformed_data(ticker):
     # for ticker in sp_500:
