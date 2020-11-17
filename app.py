@@ -22,7 +22,7 @@ def get_stock_value(ticker):
     recommendation = prediction[1]
     ba_score_test = prediction[0]
     answer = "Tomorrow's prediction for " + str(ticker) + ": "  \
-        + "We recommend you to " + recommendation + " it." \
+        + "we recommend you to " + recommendation + " it." \
         +" Note that our latest balanced accuracy score for this ticker is: " + ba_score_test 
     return answer
 
