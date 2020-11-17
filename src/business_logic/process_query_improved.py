@@ -17,7 +17,7 @@ def create_business_logic(ticker):
 class BusinessLogic:
     #Creates the business logic object
     def __init__(self, model_creator):
-        self._root_bucket = 'ticker_model_bucket'
+        self._root_bucket = 'ycng_228_ticker_model_bucket_h'
         self._config = configparser.ConfigParser()
         self._config.read('application.conf')
         # Seems like model_creator is simply the stock model in question
