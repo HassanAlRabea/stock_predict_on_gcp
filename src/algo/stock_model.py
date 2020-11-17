@@ -51,9 +51,9 @@ def get_train_test_split(df):
     test = df[num_train+num_cv:].copy()
 
     y_traincv = train_cv['signal']
-    X_traincv = train_cv[['previous_close', 'month']]
+    X_traincv = train_cv[['previous_close']]
     y_test = test['signal']
-    X_test = test[['previous_close', 'month']]
+    X_test = test[['previous_close']]
 
     return y_traincv, X_traincv, y_test, X_test
 
