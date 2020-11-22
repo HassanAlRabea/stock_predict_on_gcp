@@ -98,4 +98,5 @@ dependencies:
     - websockets==8.1
     - wrapt==1.12.1
     - yahoo-fin==0.8.6
+    - finta==1.2
 

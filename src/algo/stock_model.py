@@ -8,6 +8,7 @@ from sklearn.metrics import balanced_accuracy_score
 from sklearn.base import BaseEstimator, TransformerMixin
 from datetime import date, datetime, time, timedelta
 from src.IO.fetch_stock_data import get_last_stock_price
+from finta import TA
 
 def get_transformed_data(ticker):
     # for ticker in sp_500:
@@ -21,9 +22,13 @@ def get_transformed_data(ticker):
     nextdf.index = as_list
     df = df.append(nextdf)
 
-    ## Transformations: add previous close and signal
+    ## Transformations: add previous close and signal as well as TA metrics
     df['previous_close'] = df['close'].shift()
     df['signal'] = np.where(df['close'] > df['previous_close'], 0, 1)
+    df['STOCH'] = TA.STOCH(df)
+    df['STOCHD'] = TA.STOCHD(df)
+    df['VZO'] = TA.VZO(df)
+    df['PZO'] = TA.PZO(df)
     df = df.dropna()      
 
     # Convert Date column to datetime
@@ -51,9 +56,9 @@ def get_train_test_split(df):
     test = df[num_train+num_cv:].copy()
 
     y_traincv = train_cv['signal']
-    X_traincv = train_cv[['previous_close']]
+    X_traincv = train_cv[['STOCH', 'STOCHD','VZO', 'PZO']]
     y_test = test['signal']
-    X_test = test[['previous_close']]
+    X_test = test[['STOCH', 'STOCHD','VZO', 'PZO']]
 
     return y_traincv, X_traincv, y_test, X_test
 
@@ -62,7 +67,7 @@ def get_best_parameters(df):
     rfr = RandomForestClassifier(n_estimators=100, max_depth=30, bootstrap=True)
     # Training and doing CV to find the best parameters
     param_dist = dict(n_estimators=list(range(1,30)), max_depth=list(range(1,10)))
-    rand = RandomizedSearchCV(rfr, param_dist, cv=10, n_iter=20, random_state=0, verbose = 1)
+    rand = RandomizedSearchCV(rfr, param_dist, cv=10, n_iter=40, random_state=0, verbose = 1)
     rand.fit(X_traincv, y_traincv)
     rand.cv_results_
     n_estimators = rand.best_params_['n_estimators']
