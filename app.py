@@ -2,8 +2,8 @@ from flask import Flask
 
 app = Flask(__name__)
 
-from src.business_logic.process_query import balanced_accuracy_result_clf
-from src.business_logic.process_query_improved import create_business_logic
+from src.business_logic.evaluate_sp500 import balanced_accuracy_result_clf
+from src.business_logic.process_query import create_business_logic
 
 @app.route('/', methods=['GET'])
 def hello():
