@@ -9,7 +9,7 @@ from src.business_logic.process_query import create_business_logic
 def hello():
     return f'Hello! Please add the following to your URL with your desired ticker:!\nEX: /get_stock_val/<ticker>\n'
 
-@app.route('/evaluate', methods=['GET'])
+@app.route('/evaluate/', methods=['GET'])
 def evaluate():
     ba_score_clf = str(round(balanced_accuracy_result_clf() * 100,2)) + " %"
     answer = "Our latest SP 500 balanced accuracy score is: " + ba_score_clf
