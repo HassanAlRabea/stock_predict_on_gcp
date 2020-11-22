@@ -24,12 +24,7 @@ def get_transformed_data(ticker):
 
     ## Transformations: add previous close and signal as well as TA metrics
     df['previous_close'] = df['close'].shift()
-    df['signal'] = np.where(df['close'] > df['previous_close'], 0, 1)
-    df['STOCH'] = TA.STOCH(df)
-    df['STOCHD'] = TA.STOCHD(df)
-    df['VZO'] = TA.VZO(df)
-    df['PZO'] = TA.PZO(df)
-    df = df.dropna()      
+    df['signal'] = np.where(df['close'] > df['previous_close'], 0, 1)    
 
     # Convert Date column to datetime
     df.loc[:, 'date'] = pd.to_datetime(df.index,format='%Y-%m-%d')
@@ -39,6 +34,11 @@ def get_transformed_data(ticker):
     df['month'] = df['date'].dt.month
     # # Sort by datetime
     df.sort_values(by='date', inplace=True, ascending=True)
+    df['STOCH'] = TA.STOCH(df)
+    df['STOCHD'] = TA.STOCHD(df)
+    df['VZO'] = TA.VZO(df)
+    df['PZO'] = TA.PZO(df)
+    df = df.dropna()
 
     return df
 
@@ -67,7 +67,7 @@ def get_best_parameters(df):
     rfr = RandomForestClassifier(n_estimators=100, max_depth=30, bootstrap=True)
     # Training and doing CV to find the best parameters
     param_dist = dict(n_estimators=list(range(1,30)), max_depth=list(range(1,10)))
-    rand = RandomizedSearchCV(rfr, param_dist, cv=10, n_iter=40, random_state=0, verbose = 1)
+    rand = RandomizedSearchCV(rfr, param_dist, cv=10, n_iter=40, random_state=0, n_jobs=-1, verbose = 1)
     rand.fit(X_traincv, y_traincv)
     rand.cv_results_
     n_estimators = rand.best_params_['n_estimators']
