@@ -10,7 +10,7 @@ from datetime import date, datetime, time, timedelta
 from src.IO.fetch_stock_data import get_last_stock_price
 from finta import TA
 
-def get_transformed_data(ticker):
+def get_transformed_data(ticker, boolean):
     # for ticker in sp_500:
     df = get_last_stock_price(ticker, True)
 
