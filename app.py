@@ -24,7 +24,7 @@ def get_stock_value(ticker):
     answer = "Tomorrow's prediction for " + str(ticker) + ": "  \
         + "we recommend you to " + recommendation + " it." \
         +" Note that our latest accuracy score for this ticker is: " + ba_score_test 
-    return answer
+    return recommendation
 
 if __name__ == '__main__':
     # Used when running locally only. When deploying to Cloud Run,
