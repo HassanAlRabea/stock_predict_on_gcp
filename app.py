@@ -5,7 +5,7 @@ app = Flask(__name__)
 from src.business_logic.evaluate_sp500 import balanced_accuracy_result_clf
 from src.business_logic.process_query import create_business_logic
 
-#Testing changes
+#Testing changes #2
 @app.route('/', methods=['GET'])
 def hello():
     return f'Hello! Please add the following to your URL with your desired ticker:!\nEX: /get_stock_val/<ticker>\n'
